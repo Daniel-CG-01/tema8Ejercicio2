@@ -1,0 +1,111 @@
+package tema8Ejercicio2;
+
+import java.awt.EventQueue;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+
+import java.sql.*;
+import java.awt.event.ContainerAdapter;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+
+public class Tema8Ejercicio2 {
+
+	private JFrame frame;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Tema8Ejercicio2 window = new Tema8Ejercicio2();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public Tema8Ejercicio2() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		String url="jdbc:mysql://127.0.0.1:3307/comunidades";
+		String user="alumno";
+		String password="Alumno123";
+		
+		try {
+			Connection con = DriverManager.getConnection(url, user, password);
+			
+			frame = new JFrame();
+			frame.setBounds(100, 100, 650, 300);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.getContentPane().setLayout(null);
+			
+			JLabel lblComunidadAutonoma = new JLabel("Comunidad Autónoma");
+			lblComunidadAutonoma.setBounds(12, 12, 168, 15);
+			frame.getContentPane().add(lblComunidadAutonoma);
+			
+			JComboBox comboBox_ComunidadesAutonomas = new JComboBox();
+			comboBox_ComunidadesAutonomas.setBounds(12, 39, 168, 24);
+			try {
+				Statement stmt = con.createStatement();
+				ResultSet rs = stmt.executeQuery("SELECT * FROM comunidad");
+				while (rs.next()) {
+					int idComunidad=rs.getInt("id");
+					String nombre=rs.getString("nombre");
+					comboBox_ComunidadesAutonomas.addItem(nombre);
+				}
+				rs.close();
+				stmt.close();
+			} catch (SQLException e2) {
+				e2.printStackTrace();
+			}
+			frame.getContentPane().add(comboBox_ComunidadesAutonomas);
+			
+			JLabel lblProvincias = new JLabel("Provincias");
+			lblProvincias.setBounds(205, 12, 168, 15);
+			frame.getContentPane().add(lblProvincias);
+			
+			JComboBox comboBoxProvincias = new JComboBox();
+			comboBoxProvincias.setBounds(205, 39, 168, 24);
+			try {
+				Statement stmt = con.createStatement();
+				ResultSet rs = stmt.executeQuery("SELECT * FROM comunidad");
+				while (rs.next()) {
+					int idComunidad=rs.getInt("id");
+				}
+				rs.close();
+				stmt.close();
+				
+				PreparedStatement sel_pstmt = con.prepareStatement("SELECT * FROM provincia WHERE provincia.id_comunidad=?");
+				sel_pstmt.setInt(1, comboBox_ComunidadesAutonomas.getSelectedIndex()+1);
+				ResultSet rs_sel = sel_pstmt.executeQuery();
+				while (rs_sel.next()) {
+					String nombre=rs_sel.getString("nombre");
+					comboBoxProvincias.addItem(nombre);
+				}
+				rs_sel.close();
+				sel_pstmt.close();
+			} catch (SQLException e2) {
+				e2.printStackTrace();
+			}
+			frame.getContentPane().add(comboBoxProvincias);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+}
