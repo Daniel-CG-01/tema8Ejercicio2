@@ -19,6 +19,7 @@ public class Tema8Ejercicio2 {
 	/**
 	 * Launch the application.
 	 */
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -35,6 +36,7 @@ public class Tema8Ejercicio2 {
 	/**
 	 * Create the application.
 	 */
+	
 	public Tema8Ejercicio2() {
 		initialize();
 	}
@@ -42,14 +44,26 @@ public class Tema8Ejercicio2 {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
-		//Estas tres lineas sirven para que el programa Java reconozca la base de datos
-		String url="jdbc:mysql://127.0.0.1:3307/comunidades";
-		String user="alumno";
-		String password="Alumno123";
+	
+	class ConnectionSingleton {
+		private static Connection con;
 		
+		public static Connection getConnection() throws SQLException {
+			//Estas tres lineas sirven para que el programa Java reconozca la base de datos
+			String url="jdbc:mysql://127.0.0.1:3307/comunidades";
+			String user="alumno";
+			String password="Alumno123";
+			
+			if (con==null ||  con.isClosed()) {
+				con=DriverManager.getConnection(url, user, password);
+			}
+			return con;
+		}
+	}
+	
+	private void initialize() {
 		try {
-			Connection con = DriverManager.getConnection(url, user, password);
+			Connection con = ConnectionSingleton.getConnection();
 			
 			frame = new JFrame();
 			frame.setBounds(100, 100, 650, 300);
